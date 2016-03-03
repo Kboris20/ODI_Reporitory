@@ -1,8 +1,5 @@
 package ch.hearc.ig.odi.serie3.business;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author boris.klett
@@ -10,43 +7,11 @@ import java.util.logging.Logger;
  */
 public class Account {
 
-    Customer customer;
+    private Customer customer;
     private String number;
     private String name;
     private double balance = 0;
-    private double rate = 0.001;
-
-    public String getNumber() {
-        return this.number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getBalance() {
-        return this.balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public double getRate() {
-        return this.rate;
-    }
-
-    public void setRate(double rate) {
-        this.rate = rate;
-    }
+    private double rate = 0.01;
 
     /**
      *
@@ -56,47 +21,74 @@ public class Account {
      * @param customer
      */
     public Account(String number, String name, double rate, Customer customer) {
+        this.customer = customer;
         this.number = number;
         this.name = name;
         this.rate = rate;
-        this.customer = customer;
     }
 
-    private static void OutOBoundException(double amount, String message) {
-        if (amount < 1) {
-
-            try {
-                throw new Exception(message);
-            } catch (Exception ex) {
-                //Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
-            }
-        }
+    public String getNumber() {
+        return this.number;
     }
 
-    private static void BalanceOutOfSolde(double amount, double balance, String message) {
-        if (balance - amount < 0) {
+    /**
+     *
+     * @param number
+     */
+    public void setNumber(String number) {
+        this.number = number;
+    }
 
-            try {
-                throw new Exception(message);
-            } catch (Exception ex) {
-                //Logger.getLogger(Account.class.getName()).log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
-            }
-        }
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     *
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getBalance() {
+        return this.balance;
+    }
+
+    /**
+     *
+     * @param balance
+     */
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public double getRate() {
+        return this.rate;
+    }
+
+    /**
+     *
+     * @param rate
+     */
+    public void setRate(double rate) {
+        this.rate = rate;
+    }
+
+    public Customer getCustomer() {
+        return this.customer;
     }
 
     /**
      *
      * @param amount
-     *
-     *
      */
     public void credit(double amount) {
         if (amount > 0) {
-            this.balance = this.balance + amount;
+            this.balance += amount;
+        } else {
+            System.out.println("Erreur : Montant négatif");
         }
-
     }
 
     /**
@@ -104,8 +96,13 @@ public class Account {
      * @param amount
      */
     public void debit(double amount) {
-
-        this.balance = this.balance - amount;
+        if (this.balance > amount && amount > 0) {
+            this.balance -= amount;
+        } else if (amount < 0) {
+            System.out.println("Erreur : Montant négatif");
+        } else {
+            System.out.println("Solde insuffisant pour débiter " + amount);
+        }
     }
 
     /**
@@ -114,13 +111,14 @@ public class Account {
      * @param source
      * @param target
      */
-    public static void transfert(double amount, Account source, Account target) {
-        Account.OutOBoundException(amount, "Le montant à transférer doit être suppérieur à 0");
-        Account.BalanceOutOfSolde(amount, source.getBalance(), "!!!! Opération réfusée.. votre solde est de: " + source.getBalance() + " vous ne pouvez pas transférer: "+amount+" !!!!");
-        if (source.getBalance() - amount > -1) {
+    public static void transfer(double amount, Account source, Account target) {
+        if (source.getBalance() > amount && amount > 0) {
             source.debit(amount);
             target.credit(amount);
+        } else if (amount < 0) {
+            System.out.println("Erreur : Montant négatif");
+        } else {
+            System.out.println("Solde insuffisant pour transférer " + amount);
         }
     }
-
 }
