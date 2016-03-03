@@ -1,7 +1,5 @@
 package ch.hearc.ig.odi.serie3.business;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 
@@ -11,7 +9,7 @@ public class Customer {
 	private String firstName;
 	private String lastName;
 	private int number;
-	private Collection<Account> accounts;
+	HashMap<String, Account> accounts = new HashMap<>();
 
         
         
@@ -25,7 +23,6 @@ public class Customer {
 		this.number = number;
                 this.firstName = firstName;
                 this.lastName = lastName;
-                this.accounts = new ArrayList<>();
 	}
 
 	public Integer getNumber() {
@@ -70,13 +67,7 @@ public class Customer {
          * @return Account
 	 */
 	public Account getAccountByNumber(String number) {
-            Account result = null;
-            for (Account a : this.accounts) {
-                if(a.getNumber().equals(number)) {
-                    result = a;
-                }
-            }
-            return result;
+            return accounts.get(number);
 	}
 
 	/**
@@ -86,10 +77,10 @@ public class Customer {
 	 * @param rate
 	 */
 	public void addAcount(String number, String name, double rate) {
-		this.accounts.add(new Account(number, name, rate, this));
+		this.accounts.put(number, new Account(number, name, rate, this));
         }
 
-	public Collection<Account> getAccounts() {
+	public HashMap<String, Account> getAccounts() {
 		return this.accounts;
 	}
 
