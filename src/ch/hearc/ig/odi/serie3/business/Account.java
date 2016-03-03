@@ -121,4 +121,10 @@ public class Account {
             System.out.println("Solde insuffisant pour transférer " + amount);
         }
     }
+
+    @Override
+    public String toString() {
+        return "\t" + this.number + " - " + this.name + ", solde = " + this.balance + ", taux = " + this.rate;
+    }
+
 }

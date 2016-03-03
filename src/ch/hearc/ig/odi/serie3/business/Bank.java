@@ -7,30 +7,40 @@ import java.util.HashMap;
  * @author Jérémy
  */
 public class Bank {
+
     private int number;
     private String name;
-    private HashMap<String, Account> accounts;
-    private HashMap<Integer, Customer> customers;
-    
+    private HashMap<String, Account> accounts = new HashMap<>();
+    private HashMap<Integer, Customer> customers = new HashMap<>();
+
     public Bank(int number, String name) {
         this.number = number;
         this.name = name;
     }
-    
-    public Account getAccountByNumber(String number) {
-       return this.accounts.get(number);
+
+    public HashMap<Integer, Customer> getCustomers() {
+        return this.customers;
     }
-    
+
+    public Account getAccountByNumber(String number) {
+        return this.accounts.get(number);
+    }
+
     public Customer getCustomerByNumber(int number) {
         return this.customers.get(number);
     }
-    
+
     public void addCustomer(int number, String firstName, String lastName) {
-        this.customers.put(number, new Customer(number, firstName, lastName));
+        if (this.customers.get(number) == null) {
+            this.customers.put(number, new Customer(number, firstName, lastName));
+        }
     }
-    
+
     public void addAccount(String number, String name, double rate, Customer customer) {
-        this.accounts.put(number, new Account(number, name, rate, customer));
-        this.customers.get(customer.getNumber()).addAcount(number, name, rate);
+        if (this.accounts.get(number) == null) {
+            Account a = new Account(number, name, rate, customer);
+            this.accounts.put(number, a);
+            this.customers.get(customer.getNumber()).addAccount(a);
+        }
     }
 }
