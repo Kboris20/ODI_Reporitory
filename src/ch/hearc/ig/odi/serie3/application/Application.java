@@ -24,6 +24,7 @@ public class Application {
     private static final Bank bank = new Bank(1, "UBS");
 
     public static void main(String[] args) throws Exception {
+        bank.addCustomer(new Customer(10, "Barfuss", "Jeremy"));
         Integer choice;
 
         do {
@@ -32,7 +33,7 @@ public class Application {
             getMenu();
 
             // RECUPERATION DU CHOIX UTILISATEUR
-            while (choice == null || choice > 9) {
+            while (choice == null || choice > 12) {
                 System.out.print(">> ");
                 try {
                     choice = Integer.parseInt(READER.readLine());
@@ -58,16 +59,25 @@ public class Application {
                     listerClients();
                     break;
                 case 6:
-                    afficherClient();
+                    listerComptes();
                     break;
                 case 7:
-                    crediterCompte();
+                    afficherClient();
                     break;
                 case 8:
-                    debiterCompte();
+                    crediterCompte();
                     break;
                 case 9:
+                    debiterCompte();
+                    break;
+                case 10:
                     transfert();
+                    break;
+                case 11:
+                    supprimerClient();
+                    break;
+                case 12:
+                    supprimerCompte();
                     break;
             }
         } while (choice != 0);
@@ -82,10 +92,13 @@ public class Application {
         System.out.println("3. Editer un client");
         System.out.println("4. Editer un compte");
         System.out.println("5. Lister les clients");
-        System.out.println("6. Afficher un client et ses comptes");
-        System.out.println("7. Créditer un compte");
-        System.out.println("8. Débiter un compte");
-        System.out.println("9. Transférer un montant");
+        System.out.println("6. Lister les comptes");
+        System.out.println("7. Afficher un client et ses comptes");
+        System.out.println("8. Créditer un compte");
+        System.out.println("9. Débiter un compte");
+        System.out.println("10. Transférer un montant");
+        System.out.println("11. Supprimer un client");
+        System.out.println("12. Supprimer un compte");
         System.out.println("0. Quitter");
     }
 
@@ -289,6 +302,20 @@ public class Application {
         }
     }
 
+    public static void listerComptes() {
+        System.out.println("\n=== LISTE DES COMPTES ===");
+
+        // AFFICHAGE DES COMPTES
+        if (bank.getAccounts().size() > 0) {
+            for (Entry accounts : bank.getAccounts().entrySet()) {
+                Account acc = (Account) accounts.getValue();
+                System.out.println(acc.toString());
+            }
+        } else {
+            System.out.println("Aucun compte dans la banque");
+        }
+    }
+
     public static void afficherClient() throws IOException {
         Customer c = null;
 
@@ -408,6 +435,53 @@ public class Application {
             Account.transfer(amount, accDebit, accCredit);
             System.out.println("Transféré avec succès");
         } catch (NegativeAmmountException | InsufficientBalanceException | UnknownAccountException ex) {
+            ex.getMessage();
+        }
+    }
+
+    public static void supprimerClient() throws IOException {
+        Customer c = null;
+        try {
+            System.out.println("\n=== SUPPRIMER UN CLIENT ===");
+
+            // RECUPERATION DU CLIENT A SUPPRIMER
+            while (c == null) {
+                System.out.print("Numéro du client à supprimer : ");
+                try {
+                    c = bank.getCustomerByNumber(Integer.parseInt(READER.readLine()));
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // SUPPRESSION DU CLIENT
+            for (Entry accounts : c.getAccounts().entrySet()) {
+                Account a = (Account) accounts.getValue();
+                bank.getAccounts().remove(a.getNumber());
+            }
+            bank.getCustomers().remove(c.getNumber());
+
+            System.out.println("Client supprimé");
+
+        } catch (UnknownCustomerException ex) {
+            ex.getMessage();
+        }
+
+    }
+
+    public static void supprimerCompte() throws IOException {
+        try {
+            System.out.println("\n=== SUPPRIMER UN COMPTE ===");
+
+            // RECUPERATION DU COMPTE
+            System.out.println("Numéro du compte : ");
+            Account acc = bank.getAccountByNumber(READER.readLine());
+
+            acc.getCustomer().getAccounts().remove(acc.getNumber());
+            bank.getAccounts().remove(acc.getNumber());
+
+            System.out.println("Compte supprimé");
+        } catch (UnknownAccountException ex) {
             ex.getMessage();
         }
     }
