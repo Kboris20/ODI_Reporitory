@@ -24,8 +24,6 @@ public class Application {
     private static final Bank bank = new Bank(1, "UBS");
 
     public static void main(String[] args) throws Exception {
-        bank.addCustomer(new Customer(10, "Jeremy", "Barfuss"));
-        bank.addAccount(new Account("1", "Epargne", 1.25, bank.getCustomerByNumber(10)), bank.getCustomerByNumber(10));
         Integer choice;
 
         do {
