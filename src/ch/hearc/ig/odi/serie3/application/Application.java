@@ -3,10 +3,18 @@ package ch.hearc.ig.odi.serie3.application;
 import ch.hearc.ig.odi.serie3.business.Account;
 import ch.hearc.ig.odi.serie3.business.Bank;
 import ch.hearc.ig.odi.serie3.business.Customer;
+import ch.hearc.ig.odi.serie3.exceptions.AccountAlreadyExistException;
+import ch.hearc.ig.odi.serie3.exceptions.CustomerAlreadyExistException;
+import ch.hearc.ig.odi.serie3.exceptions.InsufficientBalanceException;
+import ch.hearc.ig.odi.serie3.exceptions.NegativeAmmountException;
+import ch.hearc.ig.odi.serie3.exceptions.UnknownAccountException;
+import ch.hearc.ig.odi.serie3.exceptions.UnknownCustomerException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,15 +27,22 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
 
-        bank.addCustomer(10, "Barfuss", "Jeremy");
-        bank.addAccount("1", "Courant", 0.1, bank.getCustomerByNumber(10));
-        bank.addAccount("2", "Epargne", 1.25, bank.getCustomerByNumber(10));
-
-        int choice = 0;
+        Integer choice;
 
         do {
+            choice = null;
+            // APPEL DU MENU PRINCIPAL
             getMenu();
-            choice = Integer.parseInt(READER.readLine());
+
+            // RECUPERATION DU CHOIX UTILISATEUR
+            while (choice == null || choice > 7) {
+                System.out.print(">> ");
+                try {
+                    choice = Integer.parseInt(READER.readLine());
+                } catch (NumberFormatException ex) {
+                    System.out.println("Veuillez entrer un numéro valable");
+                }
+            }
 
             switch (choice) {
                 case 1:
@@ -67,84 +82,216 @@ public class Application {
         System.out.println("6. Débiter un compte");
         System.out.println("7. Transférer un montant");
         System.out.println("0. Quitter");
-        System.out.print(">> ");
     }
 
     public static void creerClient() throws IOException {
-        System.out.println("\n === CREER UN CLIENT ===");
-        System.out.print("Numéro du client : ");
-        int cNumber = Integer.parseInt(READER.readLine());
-        System.out.print("Prénom du client : ");
-        String cFirstName = READER.readLine();
-        System.out.print("Nom du client : ");
-        String cLastName = READER.readLine();
-        bank.addCustomer(cNumber, cFirstName, cLastName);
-        System.out.println("Client ajouté avec succès");
+        Customer c = new Customer();
+        try {
+            System.out.println("\n === CREER UN CLIENT ===");
+
+            // RECUPERATION DU NUMERO DE CLIENT
+            while (c.getNumber() == null) {
+                try {
+                    System.out.print("Numéro du client : ");
+                    c.setNumber(Integer.parseInt(READER.readLine()));
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // RECUPERATION DU PRENOM DU CLIENT
+            System.out.print("Prénom du client : ");
+            c.setFirstName(READER.readLine());
+
+            // RECUPERATION DU NOM DU CLIENT
+            System.out.print("Nom du client : ");
+            c.setLastName(READER.readLine());
+
+            // AJOUT DU CLIENT A LA BANQUE
+            bank.addCustomer(c);
+            System.out.println("Client ajouté avec succès");
+        } catch (CustomerAlreadyExistException ex) {
+            ex.getMessage();
+        }
     }
 
     public static void ajouterCompte() throws IOException {
-        System.out.println("\n === AJOUTER UN COMPTE ===");
-        System.out.print("Numéro du client : ");
-        int cNumber = Integer.parseInt(READER.readLine());
-        System.out.print("Numéro du compte : ");
-        String aNumber = READER.readLine();
-        System.out.print("Nom du compte : ");
-        String aName = READER.readLine();
-        System.out.print("Taux du compte : ");
-        double aRate = Double.parseDouble(READER.readLine());
-        bank.addAccount(aNumber, aName, aRate, bank.getCustomerByNumber(cNumber));
-        System.out.println("Compte ajouté avec succès");
+        Customer c = null;
+        Account acc = new Account();
+        try {
+            System.out.println("\n === AJOUTER UN COMPTE ===");
+            
+            // RECUPERATION DU NUMERO DU CLIENT
+            while (c == null) {
+                try {
+                    System.out.print("Numéro du client : ");
+                    c = bank.getCustomerByNumber(Integer.parseInt(READER.readLine()));
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+            
+            // RECUPERATION DU NUMERO DE COMPTE
+            System.out.print("Numéro du compte : ");
+            acc.setNumber(READER.readLine());
+            
+            // RECUPERATION DU NOM DE COMPTE
+            System.out.print("Nom du compte : ");
+            acc.setName(READER.readLine());
+            
+            // RECUPERATION DU TAUX DE COMPTE
+            while (acc.getRate() == null) {
+                System.out.print("Taux du compte : ");
+                try {
+                    acc.setRate(Double.parseDouble(READER.readLine()));
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+            
+            // AJOUT DU COMPTE A LA BANQUE
+            bank.addAccount(acc, c);
+            System.out.println("Compte ajouté avec succès");
+        } catch (AccountAlreadyExistException | UnknownCustomerException ex) {
+            ex.getMessage();
+        }
     }
 
     public static void listerClients() {
         System.out.println("\n=== LISTE DES CLIENTS ===");
-        for (Entry customers : bank.getCustomers().entrySet()) {
-            Customer c = (Customer) customers.getValue();
-            System.out.println(c.toString());
+
+        // AFFICHAGE DES CLIENTS
+        if (bank.getCustomers().size() > 0) {
+            for (Entry customers : bank.getCustomers().entrySet()) {
+                Customer c = (Customer) customers.getValue();
+                System.out.println(c.toString());
+            }
+        } else {
+            System.out.println("Aucun client dans la banque");
         }
     }
 
     public static void afficherClient() throws IOException {
-        System.out.println("\n=== AFFICHER UN CLIENT ===");
-        System.out.print("Numéro du client : ");
-        int cNumber = Integer.parseInt(READER.readLine());
-        System.out.println(bank.getCustomerByNumber(cNumber).toString());
-        for (Entry accounts : bank.getCustomerByNumber(cNumber).getAccounts().entrySet()) {
-            Account a = (Account) accounts.getValue();
-            System.out.println(a.toString());
+        Customer c = null;
+
+        try {
+            System.out.println("\n=== AFFICHER UN CLIENT ===");
+
+            // RECUPERATION DU CLIENT
+            while (c == null) {
+                System.out.print("Numéro du client : ");
+                try {
+                    c = bank.getCustomerByNumber(Integer.parseInt(READER.readLine()));
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // AFFICHAGE DU CLIENT ET DES COMPTES
+            System.out.println(c.toString());
+            if (c.getAccounts().size() > 0) {
+                for (Entry accounts : c.getAccounts().entrySet()) {
+                    Account a = (Account) accounts.getValue();
+                    System.out.println(a.toString());
+                }
+            } else {
+                System.out.println("\tCe client ne possède aucun compte");
+            }
+        } catch (UnknownCustomerException ex) {
+            ex.getMessage();
         }
     }
 
     public static void crediterCompte() throws IOException {
-        System.out.println("\n=== CRÉDITER UN COMPTE ===");
-        System.out.println("Numéro du compte : ");
-        String aNumber = READER.readLine();
-        System.out.println("Montant à créditer : ");
-        double amount = Double.parseDouble(READER.readLine());
-        bank.getAccountByNumber(aNumber).credit(amount);
-        System.out.println("Compte crédité avec succès");
+        Account acc;
+        Double amount = null;
+
+        try {
+            System.out.println("\n=== CRÉDITER UN COMPTE ===");
+
+            // RECUPERATION DU COMPTE
+            System.out.println("Numéro du compte : ");
+            acc = bank.getAccountByNumber(READER.readLine());
+
+            // RECUPERATION DU MONTANT A CREDITER
+            while (amount == null) {
+                System.out.println("Montant à créditer : ");
+                try {
+                    amount = Double.parseDouble(READER.readLine());
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // CREDITER LE COMPTE
+            acc.credit(amount);
+            System.out.println("Compte crédité avec succès");
+        } catch (NegativeAmmountException | UnknownAccountException ex) {
+            ex.getMessage();
+        }
     }
 
     public static void debiterCompte() throws IOException {
-        System.out.println("\n=== DÉBITER UN COMPTE ===");
-        System.out.println("Numéro du compte : ");
-        String aNumber = READER.readLine();
-        System.out.println("Montant à débiter : ");
-        double amount = Double.parseDouble(READER.readLine());
-        bank.getAccountByNumber(aNumber).debit(amount);
-        System.out.println("Compte débité avec succès");
+        Account acc;
+        Double amount = null;
+
+        try {
+            System.out.println("\n=== DÉBITER UN COMPTE ===");
+
+            // RECUPERATION DU COMPTE
+            System.out.println("Numéro du compte : ");
+            acc = bank.getAccountByNumber(READER.readLine());
+
+            // RECUPERATION DU MONTANT
+            while (amount == null) {
+                System.out.println("Montant à débiter : ");
+                try {
+                    amount = Double.parseDouble(READER.readLine());
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // DEBITER LE COMPTE
+            acc.debit(amount);
+            System.out.println("Compte débité avec succès");
+        } catch (NegativeAmmountException | InsufficientBalanceException | UnknownAccountException ex) {
+            ex.getMessage();
+        }
     }
 
     public static void transfert() throws IOException {
-        System.out.println("\n=== TRANSFÉRER UNE SOMME ===");
-        System.out.println("Numéro du compte à créditer : ");
-        String aCreditNumber = READER.readLine();
-        System.out.println("Numéro du compte à débiter : ");
-        String aDebitNumber = READER.readLine();
-        System.out.println("Montant à transférer : ");
-        double amount = Double.parseDouble(READER.readLine());
-        Account.transfer(amount, bank.getAccountByNumber(aDebitNumber), bank.getAccountByNumber(aCreditNumber));
-        System.out.println("Transféré avec succès");
+        Account accCredit;
+        Account accDebit;
+        Double amount = null;
+
+        try {
+            System.out.println("\n=== TRANSFÉRER UNE SOMME ===");
+
+            // RECUPERATION DU COMPTE A CREDITER
+            System.out.println("Numéro du compte à créditer : ");
+            accCredit = bank.getAccountByNumber(READER.readLine());
+
+            // RECUPERATION DU COMPTE A DEBITER
+            System.out.println("Numéro du compte à débiter : ");
+            accDebit = bank.getAccountByNumber(READER.readLine());
+
+            // RECUPERATION DU MONTANT A TRANSFERER
+            while (amount == null) {
+                System.out.println("Montant à transférer : ");
+                try {
+                    amount = Double.parseDouble(READER.readLine());
+                } catch (NumberFormatException ex) {
+                    System.out.println("/!\\ Veuillez entrer un nombre");
+                }
+            }
+
+            // TRANSFERT DU MONTANT
+            Account.transfer(amount, accDebit, accCredit);
+            System.out.println("Transféré avec succès");
+        } catch (NegativeAmmountException | InsufficientBalanceException | UnknownAccountException ex) {
+            ex.getMessage();
+        }
     }
 
 }

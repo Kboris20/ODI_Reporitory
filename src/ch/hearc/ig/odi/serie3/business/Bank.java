@@ -1,5 +1,9 @@
 package ch.hearc.ig.odi.serie3.business;
 
+import ch.hearc.ig.odi.serie3.exceptions.AccountAlreadyExistException;
+import ch.hearc.ig.odi.serie3.exceptions.CustomerAlreadyExistException;
+import ch.hearc.ig.odi.serie3.exceptions.UnknownAccountException;
+import ch.hearc.ig.odi.serie3.exceptions.UnknownCustomerException;
 import java.util.HashMap;
 
 /**
@@ -22,25 +26,48 @@ public class Bank {
         return this.customers;
     }
 
-    public Account getAccountByNumber(String number) {
-        return this.accounts.get(number);
+    public Account getAccountByNumber(String number) throws UnknownAccountException {
+        if (this.accounts.get(number) != null) {
+            return this.accounts.get(number);
+        } else {
+            throw new UnknownAccountException(number);
+        }
     }
 
-    public Customer getCustomerByNumber(int number) {
-        return this.customers.get(number);
+    public Customer getCustomerByNumber(int number) throws UnknownCustomerException {
+        if (this.customers.get(number) != null) {
+            return this.customers.get(number);
+        } else {
+            throw new UnknownCustomerException(number);
+        }
     }
 
-    public void addCustomer(int number, String firstName, String lastName) {
+    public void addCustomer(int number, String firstName, String lastName) throws CustomerAlreadyExistException {
         if (this.customers.get(number) == null) {
             this.customers.put(number, new Customer(number, firstName, lastName));
+        } else {
+            throw new CustomerAlreadyExistException();
         }
     }
 
-    public void addAccount(String number, String name, double rate, Customer customer) {
-        if (this.accounts.get(number) == null) {
-            Account a = new Account(number, name, rate, customer);
-            this.accounts.put(number, a);
-            this.customers.get(customer.getNumber()).addAccount(a);
+    public void addCustomer(Customer c) throws CustomerAlreadyExistException {
+        if (this.customers.get(c.getNumber()) == null) {
+            this.customers.put(c.getNumber(), c);
+        } else {
+            throw new CustomerAlreadyExistException();
         }
+    }
+
+    public void addAccount(Account account, Customer customer) throws AccountAlreadyExistException {
+        if (this.accounts.get(account.getNumber()) == null) {
+            this.accounts.put(account.getNumber(), account);
+            this.customers.get(customer.getNumber()).addAccount(account);
+        } else {
+            throw new AccountAlreadyExistException();
+        }
+    }
+
+    public void addAccount(String number, String name, double rate, Customer customer) throws AccountAlreadyExistException {
+        this.addAccount(new Account(number, name, rate, customer), customer);
     }
 }

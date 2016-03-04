@@ -1,5 +1,8 @@
 package ch.hearc.ig.odi.serie3.business;
 
+import ch.hearc.ig.odi.serie3.exceptions.InsufficientBalanceException;
+import ch.hearc.ig.odi.serie3.exceptions.NegativeAmmountException;
+
 /**
  *
  * @author boris.klett
@@ -11,8 +14,12 @@ public class Account {
     private String number;
     private String name;
     private double balance = 0;
-    private double rate = 0.01;
+    private Double rate;
 
+    public Account() {
+        
+    }
+    
     /**
      *
      * @param number
@@ -63,7 +70,7 @@ public class Account {
         this.balance = balance;
     }
 
-    public double getRate() {
+    public Double getRate() {
         return this.rate;
     }
 
@@ -82,26 +89,29 @@ public class Account {
     /**
      *
      * @param amount
+     * @throws ch.hearc.ig.odi.serie3.exceptions.NegativeAmmountException
      */
-    public void credit(double amount) {
+    public void credit(double amount) throws NegativeAmmountException {
         if (amount > 0) {
             this.balance += amount;
         } else {
-            System.out.println("Erreur : Montant négatif");
+            throw new NegativeAmmountException();
         }
     }
 
     /**
      *
      * @param amount
+     * @throws ch.hearc.ig.odi.serie3.exceptions.NegativeAmmountException
+     * @throws ch.hearc.ig.odi.serie3.exceptions.InsufficientBalanceException
      */
-    public void debit(double amount) {
+    public void debit(double amount) throws NegativeAmmountException, InsufficientBalanceException {
         if (this.balance > amount && amount > 0) {
             this.balance -= amount;
         } else if (amount < 0) {
-            System.out.println("Erreur : Montant négatif");
+            throw new NegativeAmmountException();
         } else {
-            System.out.println("Solde insuffisant pour débiter " + amount);
+            throw new InsufficientBalanceException();
         }
     }
 
@@ -110,15 +120,17 @@ public class Account {
      * @param amount
      * @param source
      * @param target
+     * @throws ch.hearc.ig.odi.serie3.exceptions.NegativeAmmountException
+     * @throws ch.hearc.ig.odi.serie3.exceptions.InsufficientBalanceException
      */
-    public static void transfer(double amount, Account source, Account target) {
+    public static void transfer(double amount, Account source, Account target) throws NegativeAmmountException, InsufficientBalanceException {
         if (source.getBalance() > amount && amount > 0) {
             source.debit(amount);
             target.credit(amount);
         } else if (amount < 0) {
-            System.out.println("Erreur : Montant négatif");
+            throw new NegativeAmmountException();
         } else {
-            System.out.println("Solde insuffisant pour transférer " + amount);
+            throw new InsufficientBalanceException();
         }
     }
 
