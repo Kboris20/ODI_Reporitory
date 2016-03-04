@@ -11,10 +11,9 @@ public class Customer {
     private Integer number;
     HashMap<String, Account> accounts = new HashMap<>();
 
-    
     public Customer() {
     }
-    
+
     /**
      *
      * @param number

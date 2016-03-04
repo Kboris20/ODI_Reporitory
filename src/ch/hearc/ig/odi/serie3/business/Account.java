@@ -17,9 +17,9 @@ public class Account {
     private Double rate;
 
     public Account() {
-        
+
     }
-    
+
     /**
      *
      * @param number
@@ -86,6 +86,10 @@ public class Account {
         return this.customer;
     }
 
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     /**
      *
      * @param amount
@@ -136,7 +140,7 @@ public class Account {
 
     @Override
     public String toString() {
-        return "\t" + this.number + " - " + this.name + ", solde = " + this.balance + ", taux = " + this.rate;
+        return this.number + " - " + this.name + ", solde = " + this.balance + ", taux = " + this.rate;
     }
 
 }

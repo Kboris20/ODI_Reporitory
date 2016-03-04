@@ -26,6 +26,10 @@ public class Bank {
         return this.customers;
     }
 
+    public HashMap<String, Account> getAccounts() {
+        return this.accounts;
+    }
+
     public Account getAccountByNumber(String number) throws UnknownAccountException {
         if (this.accounts.get(number) != null) {
             return this.accounts.get(number);
