@@ -11,14 +11,15 @@ package ch.hearc.ig.odi.serie3.business;
  */
 public class Company extends Customer{
 
+    private String companyName;
     private String phone;
     private String fax;
     
     public Company(){
-        this(null, null, null);
+        this(null, null, null, null);
     }
     
-    public Company(Integer number, String phone, String fax) {
+    public Company(Integer number, String companyName, String phone, String fax) {
         super();
         
         this.phone = phone;
@@ -39,6 +40,14 @@ public class Company extends Customer{
 
     public void setFax(String fax) {
         this.fax = fax;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
     
     

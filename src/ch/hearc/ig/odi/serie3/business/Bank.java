@@ -48,7 +48,7 @@ public class Bank {
 
     public void addCustomer(int number, String firstName, String lastName) throws CustomerAlreadyExistException {
         if (this.customers.get(number) == null) {
-            this.customers.put(number, new Customer(number, firstName, lastName));
+            this.customers.put(number, new Customer(number));
         } else {
             throw new CustomerAlreadyExistException();
         }

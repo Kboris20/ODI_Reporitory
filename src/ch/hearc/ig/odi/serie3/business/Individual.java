@@ -14,7 +14,7 @@ public class Individual extends Customer {
     String email;
     
     public Individual(int number, String firstName, String lastName, Date p_birthdate, String p_email) {
-        super(number, firstName, lastName);
+        super(number);
         this.birthdate = p_birthdate;
         this.email = p_email;
     }
