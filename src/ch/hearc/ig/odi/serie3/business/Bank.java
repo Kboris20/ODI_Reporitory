@@ -56,14 +56,6 @@ public class Bank {
         }
     }
 
-    public void addCustomer(Customer c) throws CustomerAlreadyExistException {
-        if (this.customers.get(c.getNumber()) == null) {
-            this.customers.put(c.getNumber(), c);
-        } else {
-            throw new CustomerAlreadyExistException();
-        }
-    }
-
     public void addAccount(Account account, Customer customer) throws AccountAlreadyExistException {
         if (this.accounts.get(account.getNumber()) == null) {
             this.accounts.put(account.getNumber(), account);
