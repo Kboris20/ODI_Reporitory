@@ -6,8 +6,7 @@ import java.util.HashMap;
 
 public class Customer {
 
-    private String firstName;
-    private String lastName;
+    
     private Integer number;
     HashMap<String, Account> accounts = new HashMap<>();
 
@@ -22,8 +21,6 @@ public class Customer {
      */
     public Customer(Integer number, String firstName, String lastName) {
         this.number = number;
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
 
     public Integer getNumber() {
@@ -38,30 +35,7 @@ public class Customer {
         this.number = number;
     }
 
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    /**
-     *
-     * @param firstName
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    /**
-     *
-     * @param lastName
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
+  
     /**
      *
      * @param number
@@ -90,7 +64,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return this.number + " - " + this.firstName + " " + this.lastName;
+        return this.number + " - " ;
     }
 
 }
