@@ -59,6 +59,17 @@ public class Bank {
         return i;
     }
 
+    
+    public Company addCompany(int number, String companyName, String phone, String fax) throws CustomerAlreadyExistException {
+        if (this.customers.get(number) == null) {
+            Company comp = new Company(number, companyName, phone, fax);
+            this.customers.put(number, comp);
+            return comp;
+        } else {
+            throw new CustomerAlreadyExistException();
+        }
+    }
+
     public void addAccount(Account account, Customer customer) throws AccountAlreadyExistException {
         if (this.accounts.get(account.getNumber()) == null) {
             this.accounts.put(account.getNumber(), account);
