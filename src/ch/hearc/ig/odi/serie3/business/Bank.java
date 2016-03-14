@@ -4,6 +4,7 @@ import ch.hearc.ig.odi.serie3.exceptions.AccountAlreadyExistException;
 import ch.hearc.ig.odi.serie3.exceptions.CustomerAlreadyExistException;
 import ch.hearc.ig.odi.serie3.exceptions.UnknownAccountException;
 import ch.hearc.ig.odi.serie3.exceptions.UnknownCustomerException;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -16,6 +17,7 @@ public class Bank {
     private String name;
     private HashMap<String, Account> accounts = new HashMap<>();
     private HashMap<Integer, Customer> customers = new HashMap<>();
+    private HashMap<Integer, Individual> individuals = new HashMap<>();
 
     public Bank(int number, String name) {
         this.number = number;
@@ -46,20 +48,15 @@ public class Bank {
         }
     }
 
-    public void addCustomer(int number, String firstName, String lastName) throws CustomerAlreadyExistException {
-        if (this.customers.get(number) == null) {
-            this.customers.put(number, new Customer(number));
+    public Individual addIndividual(int number, String firstName, String lastName, Date p_birthdate, String p_email) throws CustomerAlreadyExistException {
+        Individual i = new Individual(number, firstName, lastName, p_birthdate, p_email);
+        if (this.individuals.get(number) == null) {
+            this.individuals.put(number, i);
         } else {
             throw new CustomerAlreadyExistException();
         }
-    }
-
-    public void addCustomer(Customer c) throws CustomerAlreadyExistException {
-        if (this.customers.get(c.getNumber()) == null) {
-            this.customers.put(c.getNumber(), c);
-        } else {
-            throw new CustomerAlreadyExistException();
-        }
+        
+        return i;
     }
 
     public void addAccount(Account account, Customer customer) throws AccountAlreadyExistException {
